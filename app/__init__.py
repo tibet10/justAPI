@@ -1,6 +1,5 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-<<<<<<< HEAD
 from sqlalchemy import create_engine
 import os
 
