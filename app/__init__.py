@@ -8,7 +8,7 @@ app = Flask(__name__)
 
 class Database():
     def __init__(self, db_url=None):        
-        self.db_url = db_url or os.getenv('SQLALCHEMY_DATABASE_URI')
+        self.db_url = db_url or os.getenv('SQLALCHEMY_DATABASE_URI_UAT')
 
         if not self.db_url:
             raise ValueError('You must provide db url')
