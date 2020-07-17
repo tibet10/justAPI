@@ -7,8 +7,8 @@ import os
 app = Flask(__name__)
 
 class Database():
-    def __init__(self, db_url=None):        
-        self.db_url = db_url or os.getenv('SQLALCHEMY_DATABASE_URI_UAT')
+    def __init__(self, db_url=None):   
+        self.db_url = db_url or os.getenv('SQLALCHEMY_DATABASE_URI')
 
         if not self.db_url:
             raise ValueError('You must provide db url')
@@ -78,10 +78,10 @@ def GetDeletedSpireOrders():
     try:
         db = Database() 
 
-        result = db.query("SELECT _deleted, sales_orders.id, sales_orders.order_no, sales_orders.status, " + 
-                          "sales_orders.order_date, sales_orders._created, " + 
-                          "sales_orders._modified, sales_orders._modified_by, " + 
-                          "sales_orders._created_by " + 
+        result = db.query("SELECT _deleted, sales_orders.id, sales_orders.order_no AS orderNo, sales_orders.status, " + 
+                          "sales_orders.order_date AS orderDate, sales_orders._created AS created, " + 
+                          "sales_orders._modified AS modified, sales_orders._modified_by AS modifiedBy, " + 
+                          "sales_orders._created_by AS createdBy " + 
                           "FROM sales_orders " + 
                           "WHERE sales_orders._deleted is not null")
 
@@ -110,6 +110,43 @@ def GetNewSpireInvoices():
                           "FROM sales_history " +
                           "WHERE sales_history._modified > '" + modified + "'")
 
+        json_result = jsonify([dict(r) for r in result])
+
+    except Exception as e:
+        abort(404, description=str(e))
+
+    return json_result
+
+@app.route('/sales/invoices/GetAllSpireInvoices', methods=['GET'])
+def GetAllSpireInvoices():
+    try:
+        db = Database() 
+
+        result = db.query("SELECT id, invoice_no AS invoiceNo, invoice_date AS invoiceDate, order_no AS orderNo, " + 
+                          "division, location, profit_center AS profitCenter,order_date AS orderDate,required_date AS requiredDate, " +
+                          "_created AS created,_modified AS modified,_created_by AS createdBy,_modified_by AS modifiedBy " + 
+                          "FROM sales_history ")
+
+        json_result = jsonify([dict(r) for r in result])
+
+    except Exception as e:
+        abort(404, description=str(e))
+
+    return json_result
+
+@app.route('/sales/orders/GetAllSpireOrders', methods=['GET'])
+def GetAllSpireOrders():
+    try:
+        db = Database() 
+
+        result = db.query("SELECT sales_orders.id, sales_orders.order_no AS orderNo, sales_orders.status, " + 
+                          "sales_orders.order_date AS orderDate, sales_orders._created AS created, " +
+                          "sales_orders._modified AS modified, sales_orders._modified_by AS modifiedBy, " +
+                          "sales_orders._created_by AS createdBy " + 
+                          "FROM sales_orders " + 
+                          "LEFT JOIN sales_order_items ON sales_orders.id = CAST (sales_order_items.order_no AS INTEGER) " +
+                          "WHERE sales_orders._deleted is null")
+        
         json_result = jsonify([dict(r) for r in result])
 
     except Exception as e:
