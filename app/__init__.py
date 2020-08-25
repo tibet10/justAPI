@@ -8,7 +8,7 @@ app = Flask(__name__)
 
 class Database():
     def __init__(self, db_url=None):   
-        self.db_url = db_url or os.getenv('SQLALCHEMY_DATABASE_URI')
+        self.db_url = db_url or os.getenv('SQLALCHEMY_DATABASE_URI_UAT_2')
 
         if not self.db_url:
             raise ValueError('You must provide db url')
@@ -146,6 +146,27 @@ def GetAllSpireOrders():
                           "FROM sales_orders " + 
                           "LEFT JOIN sales_order_items ON sales_orders.id = CAST (sales_order_items.order_no AS INTEGER) " +
                           "WHERE sales_orders._deleted is null")
+        
+        json_result = jsonify([dict(r) for r in result])
+
+    except Exception as e:
+        abort(404, description=str(e))
+
+    return json_result
+
+@app.route('/sales/orders/GetSpireOrderByOrderNumber', methods=['GET'])
+def GetSpireOrderByOrderNumber():
+    try:
+        orderNumber = request.args.get('orderNumber')
+
+        db = Database() 
+
+        result = db.query("SELECT sales_orders.id, sales_orders.order_no AS orderNo, sales_orders.status, " + 
+                          "sales_orders.order_date AS orderDate, sales_orders._created AS created, " +
+                          "sales_orders._modified AS modified, sales_orders._modified_by AS modifiedBy, " +
+                          "sales_orders._created_by AS createdBy " + 
+                          "FROM sales_orders " + 
+                          "WHERE sales_orders.order_no = '" + orderNumber + "' LIMIT 1")
         
         json_result = jsonify([dict(r) for r in result])
 
