@@ -17,6 +17,7 @@ Base.metadata.create_all(bind=engine)
 def session_scope():
     """Provide a transactional scope around a series of operations."""
     session = Session()
+    session.expire_on_commit = False
     try:
         yield session
         session.commit()
@@ -24,4 +25,5 @@ def session_scope():
         session.rollback()
         raise
     finally:
+        session.expunge_all()
         session.close()
