@@ -1,16 +1,16 @@
 from flask import Flask, jsonify, json, request, abort, render_template, Blueprint
-from ..repository.order_repository import OrderRepository
-from ..repository.order_items_repository import OrderItemRepository
-from ..repository.customer_repository import CustomerRepository
-from ..repository.address_repository import AddressRepository
-from ..service.order_item_service import OrderItemService
-from ..service.customer_service import CustomerService
-from ..service.address_service import AddressService
-from ..service.sales_tax_service import SalesTaxService
-from ...database import session_scope
 from datetime import datetime
 
+from .repository import OrderRepository
+from ..customer.service import CustomerService
+from ..address.service import AddressService
+from ..tax.service import SalesTaxService
+from ..inventory.service import InventoryService
+
 class OrderService:
+
+    def __init__(self):
+        pass
 
     def getOrderById(id):
         try:
@@ -59,16 +59,16 @@ class OrderService:
                     "totalDiscount": str(sales_order.total_discount)
                 }
 
-                sales_order_items = OrderItemRepository.getOrderItemsByOrderNo(sales_order.order_no)
-                result['items'] = OrderItemService.createOrderItemDetails(sales_order_items)
+                sales_order_items = OrderRepository.getOrderItemsByOrderNo(sales_order.order_no)
+                result['items'] = OrderService.createOrderItemDetails(sales_order_items)
 
-                customer = CustomerRepository.getCustomerByNo(sales_order.cust_no)
+                customer = CustomerService.getCustomerByNo(sales_order.cust_no)
                 result['customer'] = CustomerService.createCustomerDetails(customer)
 
-                billing_address = AddressRepository.getBillingAddressByOrderNo(sales_order.order_no)
+                billing_address = AddressService.getBillingAddressByOrderNo(sales_order.order_no)
                 result['address'] = AddressService.createBillingAddressDetails(billing_address)
 
-                shipping_address = AddressRepository.getShippingAddressByOrderNo(sales_order.order_no)                
+                shipping_address = AddressService.getShippingAddressByOrderNo(sales_order.order_no)                
                 result['shippingAddress'] = AddressService.createShippingAddressDetails(shipping_address)
 
                 sales_taxes = SalesTaxService.getSalesTaxByNumber(shipping_address.sales_tax_no)
@@ -80,3 +80,30 @@ class OrderService:
             raise Exception(str(ex))
         
         return None
+
+    def createOrderItemDetails(sales_order_items):
+        try:
+            result = []
+
+            for row in sales_order_items:
+
+                inventory = InventoryService.getInventoryByPartNo(row.part_no)
+                
+                result.append({
+                    'id': row.id,
+                    'partNo': row.part_no,
+                    'description': row.description,
+                    'orderQty': int(row.order_qty),
+                    'unitPrice': str(row.unit_price),
+                    'inventory': InventoryService.createInventoryDetails(inventory) if inventory != None else None,
+                    'retailPrice': str(row.retail_price),
+                    'vendor': row.vendor_no,
+                    'sequence': row.sequence
+                })
+            
+            return result
+
+        except Exception as ex:
+            raise Exception(str(ex))
+        
+        return result

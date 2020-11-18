@@ -1,6 +1,5 @@
 from flask import Flask, jsonify, json, request, abort, render_template, Blueprint
-from ..repository.sales_tax_repository import SalesTaxRepository
-from ...database import session_scope
+from .repository import SalesTaxRepository
 
 class SalesTaxService:
 
@@ -9,7 +8,6 @@ class SalesTaxService:
             return SalesTaxRepository.getSalesTaxByNumber(TaxNos)
         except Exception as ex:
             raise Exception(str(ex))
-
     
     def createTaxDetails(sales_taxes):
         try:

@@ -1,8 +1,17 @@
 from flask import Flask, jsonify, json, request, abort, render_template, Blueprint
-from ..repository.order_items_repository import OrderItemRepository
-from ...database import session_scope
+
+from .repository import CustomerRepository
 
 class CustomerService:
+
+    def getCustomerByNo(custNo):
+        try:
+            return CustomerRepository.getCustomerByNo(custNo)
+
+        except Exception as ex:
+            raise Exception(str(ex))
+        
+        return None
 
     def createCustomerDetails(customer):
         try:

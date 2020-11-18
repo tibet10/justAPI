@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, json, request, abort, render_template, Blueprint
-from ..models import Inventory
-from ...database import session_scope
+from .models import Inventory
+from ..database import session_scope
 
 class InventoryRepository:
 

@@ -1,9 +1,9 @@
 from flask import Flask, jsonify, json, request, abort, render_template, Blueprint
-from ..models import Address
-from ...database import session_scope
+from .models import Address
+from ..database import session_scope
 
 class AddressRepository:
-
+    
     def getBillingAddressByOrderNo(orderNo):
         try:
             with session_scope() as session:      

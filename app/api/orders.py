@@ -1,11 +1,10 @@
 from flask import Flask, jsonify, json, request, abort, render_template, Blueprint
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.ext.serializer import loads, dumps
-from .models import SalesOrder, SalesOrderItem
-from ..database import session_scope
-from .service.order_service import OrderService
-from .service.order_item_service import OrderItemService
 from datetime import datetime
+
+from ..database import session_scope
+from ..orders.service import OrderService
 from . import orders_bp
 
 @orders_bp.route('/sales/orders/GetSpireOrderDetail/<id>', methods=['GET'])
@@ -23,7 +22,6 @@ def GetSpireOrderDetailsById(id):
     except Exception as ex:
         abort(404, description=str(ex))
         
-    
 @orders_bp.route('/sales/orders/GetAllSpireOrders', methods=['GET'])
 def GetAllSpireOrders():
     result = []                
@@ -54,7 +52,6 @@ def GetAllSpireOrders():
         abort(404, description=str(ex))
         
     return result
-
 
 @orders_bp.route('/sales/orders/GetNewSpireOrders', methods=['GET'])
 def GetNewSpireOrders():    
@@ -109,9 +106,10 @@ def GetDeletedSpireOrders():
                     '_deleted': sales_order._deleted
                 })
 
-        return jsonify(result)  
+        return jsonify(result)
 
     except Exception as e:
         abort(404, description=str(e))
 
     return result
+

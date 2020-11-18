@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, json, request, abort, render_template, Blueprint
 from sqlalchemy import or_, and_
-from ..models import SalesOrder, SalesOrderItem
-from ...database import session_scope
+from .models import SalesOrder, SalesOrderItem
+from ..database import session_scope
 
 class OrderRepository:
 
@@ -10,8 +10,8 @@ class OrderRepository:
             with session_scope() as session:      
 
                     sales_order = session.query(SalesOrder) \
-                                        .filter(SalesOrder.id == id) \
-                                        .first()
+                                 .filter(SalesOrder.id == id) \
+                                 .first()
                     return sales_order
 
         except Exception as ex:
@@ -34,7 +34,6 @@ class OrderRepository:
         
         return None
 
-    
     def getRecentOrders(modified):
         try:
             with session_scope() as session:      
@@ -57,11 +56,25 @@ class OrderRepository:
             with session_scope() as session:      
 
                     sales_order = session.query(SalesOrder) \
-                                        .filter(SalesOrder._deleted != None) \
-                                        .all()
-                    return sales_order
+                                 .filter(SalesOrder._deleted != None) \
+                                 .all()
+                    return sales_order  
 
         except Exception as ex:
            raise Exception(str(ex))
+        
+        return None
+
+    def getOrderItemsByOrderNo(orderNo):
+        try:
+            with session_scope() as session:      
+
+                sales_order_items = session.query(SalesOrderItem)\
+                                            .filter(SalesOrderItem.order_no == orderNo) \
+                                            .all()
+                return sales_order_items
+
+        except Exception as ex:
+            raise Exception(str(ex))
         
         return None

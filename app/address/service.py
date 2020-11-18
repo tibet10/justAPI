@@ -1,9 +1,26 @@
 from flask import Flask, jsonify, json, request, abort, render_template, Blueprint
-from ..repository.address_repository import AddressRepository
-from ...database import session_scope
+from .repository import AddressRepository
 
 class AddressService:
 
+    def getBillingAddressByOrderNo(orderNo):
+        try:
+            return AddressRepository.getBillingAddressByOrderNo(orderNo)
+
+        except Exception as ex:
+            raise Exception(str(ex))
+        
+        return None
+
+    def getShippingAddressByOrderNo(orderNo):
+        try:
+            return AddressRepository.getShippingAddressByOrderNo(orderNo)
+
+        except Exception as ex:
+            raise Exception(str(ex))
+        
+        return None
+    
     def createBillingAddressDetails(address):
         try:
             result = {

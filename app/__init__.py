@@ -1,5 +1,5 @@
 from flask import Flask, Blueprint
-from .orders.views import orders_bp
+from .api.orders import orders_bp
 
 app = Flask(__name__) 
 

@@ -1,8 +1,16 @@
 from flask import Flask, jsonify, json, request, abort, render_template, Blueprint
-from ..repository.inventory_repository import InventoryRepository
-from ...database import session_scope
+from .repository import InventoryRepository
 
 class InventoryService:
+
+    def getInventoryByPartNo(partNo):
+        try:
+            return InventoryRepository.getInventoryByPartNo(partNo)
+
+        except Exception as ex:
+            raise Exception(str(ex))
+        
+        return None
 
     def createInventoryDetails(inventory):
         try:
