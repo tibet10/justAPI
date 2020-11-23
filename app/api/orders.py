@@ -73,8 +73,6 @@ def GetAllSpireOrders():
 
     except Exception as ex:
         abort(404, description=str(ex))
-        
-    return result
 
 @orders_bp.route('/sales/orders/GetNewSpireOrders', methods=['GET'])
 def GetNewSpireOrders():    
@@ -107,8 +105,6 @@ def GetNewSpireOrders():
     except Exception as e:
         abort(404, description=str(e))
 
-    return result
-
 @orders_bp.route('/sales/orders/GetDeletedSpireOrders', methods=['GET'])
 def GetDeletedSpireOrders():
     try:
@@ -133,8 +129,6 @@ def GetDeletedSpireOrders():
 
     except Exception as e:
         abort(404, description=str(e))
-
-    return result
 
 
 
