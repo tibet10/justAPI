@@ -1,23 +1,48 @@
-from flask import Flask, jsonify, json, request, abort, render_template, Blueprint
+from flask import Flask, jsonify, json, request, abort, render_template, Blueprint, Response
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.ext.serializer import loads, dumps
 from datetime import datetime
 
 from ..database import session_scope
 from ..orders.service import OrderService
+from ..invoice.service import InvoiceService
 from . import orders_bp
 
 @orders_bp.route('/sales/orders/GetSpireOrderDetail/<id>', methods=['GET'])
 def GetSpireOrderDetailsById(id):
     
-    try:
-        
+    try:        
         sales_order = OrderService.getOrderById(id)
 
         #build order details
         result = OrderService.buildOrderDetails(sales_order)        
 
-        return jsonify(result)  
+        return Response(status=200, mimetype='application/json', response= json.dumps(result) if result else 'null')
+
+    except Exception as ex:
+        abort(404, description=str(ex))
+
+@orders_bp.route('/sales/orders/GetSpireOrderByOrderNumber', methods=['GET'])
+def GetSpireOrderByOrderNumber():
+    
+    try:        
+        result = {}
+
+        orderNumber = request.args.get('orderNumber')
+
+        sales_order = OrderService.getOrderByOrderNo(orderNumber)
+
+        if sales_order: 
+            result['id']= sales_order.id
+            result['orderNo']= sales_order.order_no
+            result['status']= sales_order.status
+            result['orderDate']= sales_order.order_date
+            result['created']= sales_order._created
+            result['modified']= sales_order._modified
+            result['createdBy']= sales_order._created_by
+            result['modifiedBy']= sales_order._modified_by  
+
+        return Response(status=200, mimetype='application/json', response= json.dumps(result) if result else 'null')
 
     except Exception as ex:
         abort(404, description=str(ex))
@@ -27,26 +52,24 @@ def GetAllSpireOrders():
     result = []                
             
     try:
-        with session_scope() as session:
-        
-            sales_orders = OrderService.getAllOrders()
+        sales_orders = OrderService.getAllOrders()
             
-            for row in sales_orders:
-                result.append({
-                    'id': row.SalesOrder.id,
-                    'orderNo': row.SalesOrder.order_no,
-                    'status': row.SalesOrder.status,
-                    'orderDate': row.SalesOrder.order_date,
-                    'created': row.SalesOrder._created,
-                    'modified': row.SalesOrder._modified,
-                    'modifiedBy': row.SalesOrder._modified_by,
-                    'createdBy': row.SalesOrder._created_by,
-                    'part_no': row.SalesOrderItem.part_no,
-                    'salesOrder_id': row.SalesOrder.id,
-                    'salesOrderItem_id': row.SalesOrderItem.id
-                })
-
-            return jsonify(result)  
+        for row in sales_orders:
+            result.append({
+                'id': row.SalesOrder.id,
+                'orderNo': row.SalesOrder.order_no,
+                'status': row.SalesOrder.status,
+                'orderDate': row.SalesOrder.order_date,
+                'created': row.SalesOrder._created,
+                'modified': row.SalesOrder._modified,
+                'modifiedBy': row.SalesOrder._modified_by,
+                'createdBy': row.SalesOrder._created_by,
+                'part_no': row.SalesOrderItem.part_no,
+                'salesOrder_id': row.SalesOrder.id,
+                'salesOrderItem_id': row.SalesOrderItem.id
+            })
+            
+        return Response(status=200, mimetype='application/json', response= json.dumps(result) if result else 'null')
 
     except Exception as ex:
         abort(404, description=str(ex))
@@ -79,7 +102,7 @@ def GetNewSpireOrders():
                     'createdBy': row.SalesOrder._created_by
                 })
 
-        return jsonify(result)  
+        return Response(status=200, mimetype='application/json', response= json.dumps(result) if result else 'null')
 
     except Exception as e:
         abort(404, description=str(e))
@@ -106,10 +129,13 @@ def GetDeletedSpireOrders():
                     '_deleted': sales_order._deleted
                 })
 
-        return jsonify(result)
+        return Response(status=200, mimetype='application/json', response= json.dumps(result) if result else 'null')
 
     except Exception as e:
         abort(404, description=str(e))
 
     return result
+
+
+
 

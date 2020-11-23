@@ -17,6 +17,12 @@ class OrderService:
             return OrderRepository.getOrderById(id)
         except Exception as ex:
             raise Exception(str(ex))
+    
+    def getOrderByOrderNo(orderNo):
+        try:
+            return OrderRepository.getOrderByOrderNo(orderNo)
+        except Exception as ex:
+            raise Exception(str(ex))
 
     def getAllOrders():
         try:
@@ -38,26 +44,26 @@ class OrderService:
 
     def buildOrderDetails(sales_order):
         try:
+            result = {}
+
             if sales_order:    
                 
-                result = {
-                    "id": sales_order.id,
-                    "orderNo": sales_order.order_no,
-                    "status": sales_order.status,
-                    "type": sales_order.order_type,
-                    "orderDate": sales_order.order_date,
-                    "subtotal": str(sales_order.subtotal),
-                    "total": str(sales_order.total),
-                    "created": sales_order._created,
-                    "modified": sales_order._modified,
-                    "createdBy": sales_order._created_by,
-                    "modifiedBy": sales_order._modified_by,
-                    "shippingCarrier": sales_order.ship_carrier,
-                    "shipDate": sales_order.ship_date,
-                    "trackingNo": sales_order.ship_track_id,
-                    "discount": str(sales_order.discount),
-                    "totalDiscount": str(sales_order.total_discount)
-                }
+                result['id']= sales_order.id
+                result['orderNo']= sales_order.order_no
+                result['status']= sales_order.status
+                result['type']= sales_order.order_type
+                result['orderDate']= sales_order.order_date
+                result['subtotal']= str(sales_order.subtotal)
+                result['total']= str(sales_order.total)
+                result['created']= sales_order._created
+                result['modified']= sales_order._modified
+                result['createdBy']= sales_order._created_by
+                result['modifiedBy']= sales_order._modified_by
+                result['shippingCarrier']= sales_order.ship_carrier
+                result['shipDate']= sales_order.ship_date
+                result['trackingNo']= sales_order.ship_track_id
+                result['discount']= str(sales_order.discount)
+                result['totalDiscount']= str(sales_order.total_discount)
 
                 sales_order_items = OrderRepository.getOrderItemsByOrderNo(sales_order.order_no)
                 result['items'] = OrderService.createOrderItemDetails(sales_order_items)

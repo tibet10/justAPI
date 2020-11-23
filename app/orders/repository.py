@@ -19,6 +19,20 @@ class OrderRepository:
         
         return None
 
+    def getOrderByOrderNo(orderNo):
+        try:
+            with session_scope() as session:      
+
+                    sales_order = session.query(SalesOrder) \
+                                 .filter(SalesOrder.order_no == orderNo) \
+                                 .first()
+                    return sales_order
+
+        except Exception as ex:
+           raise Exception(str(ex))
+        
+        return None
+
     def getAllOrders():
         try:
             with session_scope() as session:      
