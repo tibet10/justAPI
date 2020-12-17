@@ -46,7 +46,6 @@ def GetNewSpireInvoices():
 
     return result
 
-
 @invoices_bp.route('/sales/invoices/GetAllSpireInvoices', methods=['GET'])
 def GetAllSpireInvoices():
     result = []                

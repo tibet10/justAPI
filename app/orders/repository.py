@@ -84,8 +84,8 @@ class OrderRepository:
             with session_scope() as session:      
 
                 sales_order_items = session.query(SalesOrderItem)\
-                                            .filter(SalesOrderItem.order_no == orderNo) \
-                                            .all()
+                                    .filter(SalesOrderItem.order_no == orderNo) \
+                                    .all()
                 return sales_order_items
 
         except Exception as ex:

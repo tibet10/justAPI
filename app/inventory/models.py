@@ -97,9 +97,65 @@ class Inventory(Base):
 
 
     def __repr__(self):
-        return ('<Inventory({0},{1},{2},{3},{4})>') \
+        return ('<Inventory({0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13})>') \
                     .format(self.id, 
+                            self.product_code,
                             self.whse,
                             self.part_no, 
                             self.description,
-                            self.alt_part_no)   
+                            self.alt_part_no,
+                            self.extended_description,
+                            self.min_buy_qty,
+                            self.purchase_qty,
+                            self._created,
+                            self._modified,
+                            self._created_by,
+                            self._modified_by,
+                            self.hold)
+
+class InventoryUom(Base):
+    __tablename__ = 'inventory_uoms'
+    __table_args__ = (
+        Index('inventory_uoms_inventory_id_uom_idx', 'inventory_id', 'uom', unique=True),
+        Index('inventory_uoms_whse_part_no_uom_idx', 'whse', 'part_no', 'uom', unique=True)
+    )
+
+    id = Column(Integer, primary_key=True, server_default=text("nextval('inventory_uoms_id_seq'::regclass)"))
+    inventory_id = Column(ForeignKey('inventory.id', ondelete='CASCADE'), nullable=False)
+    whse = Column(String(6), nullable=False)
+    part_no = Column(String(34), nullable=False)
+    uom = Column(String(10))
+    description = Column(String(80))
+    qty_factor = Column(Numeric(11, 5))
+    direct_factor = Column(Boolean)
+    allow_fractional_qty = Column(Boolean)
+    buy_uom = Column(Boolean)
+    sell_uom = Column(Boolean)
+    whse_location = Column(String(20), nullable=False, server_default=text("''::character varying"))
+    weight = Column(Numeric(11, 5))
+    sell_prices = Column(ARRAY(Numeric(precision=15, scale=5)), nullable=False, server_default=text("'{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}'::numeric[]"))
+    break_qty = Column(ARRAY(Numeric(precision=11, scale=0)), nullable=False, server_default=text("'{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}'::numeric[]"))
+    break_qty_price = Column(ARRAY(Numeric(precision=15, scale=5)), nullable=False, server_default=text("'{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}'::numeric[]"))
+    use_price_factor = Column(Boolean, nullable=False)
+    price_factor = Column(Numeric(11, 5))
+    _dbversion = Column(Integer)
+    _modified = Column(DateTime)
+    _modified_by = Column(String(3))
+    _created = Column(DateTime)
+    _created_by = Column(String(3))
+
+    inventory = relationship('Inventory')   
+
+
+    def __repr__(self):
+        return ('<InventoryUom({0},{1},{2},{3},{4},{5},{6},{7},{8},{9})>') \
+                    .format(self.id, 
+                            self.inventory_id,
+                            self.whse,
+                            self.part_no, 
+                            self.uom,
+                            self.sell_prices,
+                            self._created,
+                            self._modified,
+                            self._created_by,
+                            self._modified_by)

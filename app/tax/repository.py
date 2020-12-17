@@ -9,8 +9,8 @@ class SalesTaxRepository:
             with session_scope() as session:      
 
                 sales_tax = session.query(SalesTax)\
-                                   .filter(SalesTax.tax_no.in_(TaxNos)) \
-                                   .all()
+                            .filter(SalesTax.tax_no.in_(TaxNos)) \
+                            .all()
 
                 return sales_tax
 

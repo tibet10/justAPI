@@ -9,10 +9,10 @@ class AddressRepository:
             with session_scope() as session:      
 
                     address = session.query(Address) \
-                                         .filter(Address.link_no == orderNo) \
-                                         .filter(Address.link_table == 'SORD') \
-                                         .filter(Address.addr_type == 'B') \
-                                         .first()
+                              .filter(Address.link_no == orderNo) \
+                              .filter(Address.link_table == 'SORD') \
+                              .filter(Address.addr_type == 'B') \
+                              .first()
                     return address
 
         except Exception as ex:
