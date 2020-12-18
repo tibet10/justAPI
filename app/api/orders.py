@@ -14,7 +14,6 @@ def GetSpireOrderDetailsById(id):
     try:        
         sales_order = OrderService.getOrderById(id)
 
-        #build order details
         result = OrderService.buildOrderDetails(sales_order)        
 
         return Response(status=200, mimetype='application/json', response= json.dumps(result) if result else 'null')
