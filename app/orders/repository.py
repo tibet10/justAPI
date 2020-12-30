@@ -10,8 +10,8 @@ class OrderRepository:
             with session_scope() as session:      
 
                     sales_order = session.query(SalesOrder) \
-                                 .filter(SalesOrder.id == id) \
-                                 .first()
+                                         .filter(SalesOrder.id == id) \
+                                         .first()
                     return sales_order
 
         except Exception as ex:
@@ -24,8 +24,8 @@ class OrderRepository:
             with session_scope() as session:      
 
                     sales_order = session.query(SalesOrder) \
-                                 .filter(SalesOrder.order_no == orderNo) \
-                                 .first()
+                                         .filter(SalesOrder.order_no == orderNo) \
+                                         .first()
                     return sales_order
 
         except Exception as ex:
@@ -66,12 +66,6 @@ class OrderRepository:
                                           .filter(SalesOrder._modified > modified) \
                                           .filter(SalesOrder._deleted == None) \
                                           .all()
-
-                    # sales_orders = session.query(SalesOrder, SalesOrderItem) \
-                    #                       .join(SalesOrderItem, SalesOrder.order_no == SalesOrderItem.order_no) \
-                    #                       .filter(or_(SalesOrder._modified > modified, SalesOrderItem._modified > modified)) \
-                    #                       .filter(SalesOrder._deleted == None) \
-                    #                       .all()
                                  
                     return sales_orders
 
