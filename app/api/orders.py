@@ -52,7 +52,7 @@ def GetAllSpireOrders():
             
     try:
         sales_orders = OrderService.getAllOrders()
-            
+        
         for row in sales_orders:
             result.append({
                 'id': row.SalesOrder.id,
@@ -62,10 +62,7 @@ def GetAllSpireOrders():
                 'created': row.SalesOrder._created,
                 'modified': row.SalesOrder._modified,
                 'modifiedBy': row.SalesOrder._modified_by,
-                'createdBy': row.SalesOrder._created_by,
-                'part_no': row.SalesOrderItem.part_no,
-                'salesOrder_id': row.SalesOrder.id,
-                'salesOrderItem_id': row.SalesOrderItem.id
+                'createdBy': row.SalesOrder._created_by
             })
             
         return Response(status=200, mimetype='application/json', response= json.dumps(result) if result else 'null')

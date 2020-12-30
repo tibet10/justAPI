@@ -37,9 +37,13 @@ class OrderRepository:
         try:
             with session_scope() as session:      
 
-                    sales_orders = session.query(SalesOrder, SalesOrderItem) \
-                                  .join(SalesOrderItem, SalesOrder.order_no == SalesOrderItem.order_no) \
-                                  .all()
+                    sub_query = session.query(SalesOrderItem.order_no) \
+                                       .group_by(SalesOrderItem.order_no) \
+                                       .subquery() 
+                    
+                    sales_orders = session.query(SalesOrder, sub_query) \
+                                          .join(sub_query, SalesOrder.order_no == sub_query.c.order_no) \
+                                          .all()
 
                     return sales_orders
 
@@ -52,11 +56,22 @@ class OrderRepository:
         try:
             with session_scope() as session:      
 
-                    sales_orders = session.query(SalesOrder, SalesOrderItem) \
-                                  .join(SalesOrderItem, SalesOrder.order_no == SalesOrderItem.order_no) \
-                                  .filter(or_(SalesOrder._modified > modified, SalesOrderItem._modified > modified)) \
-                                  .filter(SalesOrder._deleted == None) \
-                                  .all()
+                    sub_query = session.query(SalesOrderItem.order_no) \
+                                       .filter(SalesOrderItem._modified > modified) \
+                                       .group_by(SalesOrderItem.order_no) \
+                                       .subquery() 
+                    
+                    sales_orders = session.query(SalesOrder, sub_query) \
+                                          .join(sub_query, SalesOrder.order_no == sub_query.c.order_no) \
+                                          .filter(SalesOrder._modified > modified) \
+                                          .filter(SalesOrder._deleted == None) \
+                                          .all()
+
+                    # sales_orders = session.query(SalesOrder, SalesOrderItem) \
+                    #                       .join(SalesOrderItem, SalesOrder.order_no == SalesOrderItem.order_no) \
+                    #                       .filter(or_(SalesOrder._modified > modified, SalesOrderItem._modified > modified)) \
+                    #                       .filter(SalesOrder._deleted == None) \
+                    #                       .all()
                                  
                     return sales_orders
 
@@ -70,8 +85,8 @@ class OrderRepository:
             with session_scope() as session:      
 
                     sales_order = session.query(SalesOrder) \
-                                 .filter(SalesOrder._deleted != None) \
-                                 .all()
+                                         .filter(SalesOrder._deleted != None) \
+                                         .all()
                     return sales_order  
 
         except Exception as ex:
@@ -84,8 +99,8 @@ class OrderRepository:
             with session_scope() as session:      
 
                 sales_order_items = session.query(SalesOrderItem)\
-                                    .filter(SalesOrderItem.order_no == orderNo) \
-                                    .all()
+                                           .filter(SalesOrderItem.order_no == orderNo) \
+                                           .all()
                 return sales_order_items
 
         except Exception as ex:
