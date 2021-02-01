@@ -1,5 +1,5 @@
 from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, Numeric, String, Table, Text, text, BigInteger, Date, SmallInteger, UniqueConstraint, Index
-from sqlalchemy.dialects.postgresql import UUID, ARRAY, HSTORE
+from sqlalchemy.dialects.postgresql import UUID, ARRAY, HSTORE, JSONB
 from sqlalchemy.orm import relationship
 from ..database import Base
 
@@ -10,12 +10,17 @@ class Address(Base):
         Index('addresses_link_table_link_no_addr_type_ship_id_idx', 'link_table', 'link_no', 'addr_type', 'ship_id', unique=True),
     )
 
+    _dbversion = Column(Integer)
+    _modified = Column(DateTime)
+    _modified_by = Column(String(3))
+    _created = Column(DateTime)
+    _created_by = Column(String(3))
     id = Column(Integer, primary_key=True, server_default=text("nextval('addresses_id_seq'::regclass)"))
     link_table = Column(String(4))
     link_no = Column(String(20), index=True)
     addr_type = Column(String(1))
     ship_id = Column(String(20), nullable=False, index=True)
-    name = Column(String(60))
+    name = Column(String(60), nullable=False)
     address = Column(ARRAY(String(length=45)))
     city = Column(String(45))
     prov_state = Column(String(2))
@@ -46,12 +51,7 @@ class Address(Base):
     sales_tax_no = Column(ARRAY(SmallInteger()), nullable=False)
     sales_tax_exempt_no = Column(ARRAY(String(length=20)), nullable=False)
     ecommerce = Column(Boolean)
-    udf_data = Column(HSTORE(Text()), server_default=text("''::hstore"))
-    _dbversion = Column(Integer)
-    _modified = Column(DateTime)
-    _modified_by = Column(String(3))
-    _created = Column(DateTime)
-    _created_by = Column(String(3))
+    udf_data = Column(JSONB(astext_type=Text()), server_default=text("'{}'::jsonb"))
 
     def __repr__(self):
         return ('<Address({0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13})>') \

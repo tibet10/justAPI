@@ -1,19 +1,27 @@
-from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, Numeric, String, Table, Text, text, BigInteger, Date, SmallInteger, UniqueConstraint, Index
-from sqlalchemy.dialects.postgresql import UUID, ARRAY, HSTORE
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, Numeric, String, Table, Text, text, BigInteger, Date, SmallInteger, UniqueConstraint, Index, ForeignKeyConstraint
+from sqlalchemy.dialects.postgresql import UUID, ARRAY, HSTORE, JSONB
 from sqlalchemy.orm import relationship
 from ..database import Base
 
 class Inventory(Base):
     __tablename__ = 'inventory'
     __table_args__ = (
-        Index('inventory_whse_part_no_idx', 'whse', 'part_no', unique=True),
+        ForeignKeyConstraint(['uom_inventory', 'id'], ['inventory_uoms.uom', 'inventory_uoms.inventory_id'], deferrable=True, initially='DEFERRED'),
+        ForeignKeyConstraint(['uom_purchase', 'id'], ['inventory_uoms.uom', 'inventory_uoms.inventory_id'], deferrable=True, initially='DEFERRED'),
+        ForeignKeyConstraint(['uom_sales', 'id'], ['inventory_uoms.uom', 'inventory_uoms.inventory_id'], deferrable=True, initially='DEFERRED'),
+        Index('inventory_whse_part_no_idx', 'whse', 'part_no', unique=True)
     )
 
+    _dbversion = Column(Integer)
+    _modified = Column(DateTime)
+    _modified_by = Column(String(3))
+    _created = Column(DateTime)
+    _created_by = Column(String(3))
     id = Column(Integer, primary_key=True, server_default=text("nextval('inventory_id_seq'::regclass)"))
-    whse = Column(String(6), nullable=False)
+    whse = Column(ForeignKey('inventory_warehouses.whse'), nullable=False)
     part_no = Column(String(34), nullable=False, index=True)
     description = Column(String(80))
-    product_code = Column(String(10), index=True)
+    product_code = Column(ForeignKey('inventory_product_codes.product_code'), index=True)
     hold = Column(SmallInteger)
     current_cost = Column(Numeric(15, 5))
     average_cost = Column(Numeric(15, 5))
@@ -26,7 +34,6 @@ class Inventory(Base):
     po_due_date = Column(Date)
     discountable = Column(Boolean)
     serialized = Column(Boolean, nullable=False, server_default=text("false"))
-    sales_acct = Column(SmallInteger)
     onhand_qty = Column(Numeric(15, 5))
     reorder_qty = Column(Numeric(15, 5))
     committed_qty = Column(Numeric(15, 5))
@@ -41,7 +48,6 @@ class Inventory(Base):
     last_modified = Column(DateTime)
     allow_back_orders = Column(Boolean)
     allow_returns = Column(Boolean)
-    preferred_vendor = Column(String(20))
     rebate_ab = Column(Boolean)
     rebate_bc = Column(Boolean)
     rebate_mb = Column(Boolean)
@@ -59,7 +65,6 @@ class Inventory(Base):
     pack_size = Column(Numeric(9, 3))
     color_text = Column(BigInteger, nullable=False, server_default=text("'0'::bigint"))
     color_back = Column(BigInteger, nullable=False, server_default=text("'16777215'::bigint"))
-    levy_code = Column(String(3))
     lot_numbered = Column(Boolean, nullable=False, server_default=text("false"))
     duty_perc = Column(Numeric(7, 2))
     freight_perc = Column(Numeric(7, 2))
@@ -79,19 +84,21 @@ class Inventory(Base):
     this_year_revenue = Column(Numeric(15, 5), server_default=text("'0'::numeric"))
     next_year_qty = Column(Numeric(15, 5), server_default=text("'0'::numeric"))
     next_year_revenue = Column(Numeric(15, 5), server_default=text("'0'::numeric"))
-    udf_data = Column(HSTORE(Text()), server_default=text("''::hstore"))
+    udf_data = Column(JSONB(astext_type=Text()), server_default=text("'{}'::jsonb"))
+    last_sale_date = Column(Date)
+    last_receipt_date = Column(Date)
     last_count_date = Column(Date)
     last_count_qty = Column(Numeric(15, 5))
     last_count_variance = Column(Numeric(15, 5))
     show_options = Column(Boolean)
-    _dbversion = Column(Integer)
-    _modified = Column(DateTime)
-    _modified_by = Column(String(3))
-    _created = Column(DateTime)
-    _created_by = Column(String(3))  
+    sales_tax_provider_code = Column(String)
+    expiry_required = Column(Boolean, nullable=False, server_default=text("false"))
 
-
-
+    inventory_product_code = relationship('InventoryProductCode')
+    inventory_uom = relationship('InventoryUom', primaryjoin='Inventory.uom_inventory == InventoryUom.uom')
+    inventory_uom1 = relationship('InventoryUom', primaryjoin='Inventory.uom_purchase == InventoryUom.uom')
+    inventory_uom2 = relationship('InventoryUom', primaryjoin='Inventory.uom_sales == InventoryUom.uom')
+   
     def __repr__(self):
         return ('<Inventory({0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13})>') \
                     .format(self.id, 
@@ -112,10 +119,15 @@ class Inventory(Base):
 class InventoryUom(Base):
     __tablename__ = 'inventory_uoms'
     __table_args__ = (
-        Index('inventory_uoms_inventory_id_uom_idx', 'inventory_id', 'uom', unique=True),
-        Index('inventory_uoms_whse_part_no_uom_idx', 'whse', 'part_no', 'uom', unique=True)
+        Index('inventory_uoms_whse_part_no_uom_idx', 'whse', 'part_no', 'uom', unique=True),
+        Index('inventory_uoms_inventory_id_uom_idx', 'inventory_id', 'uom', unique=True)
     )
 
+    _dbversion = Column(Integer)
+    _modified = Column(DateTime)
+    _modified_by = Column(String(3))
+    _created = Column(DateTime)
+    _created_by = Column(String(3))
     id = Column(Integer, primary_key=True, server_default=text("nextval('inventory_uoms_id_seq'::regclass)"))
     inventory_id = Column(ForeignKey('inventory.id', ondelete='CASCADE'), nullable=False)
     whse = Column(String(6), nullable=False)
@@ -132,13 +144,8 @@ class InventoryUom(Base):
     sell_prices = Column(ARRAY(Numeric(precision=15, scale=5)), nullable=False, server_default=text("'{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}'::numeric[]"))
     use_price_factor = Column(Boolean, nullable=False)
     price_factor = Column(Numeric(11, 5))
-    _dbversion = Column(Integer)
-    _modified = Column(DateTime)
-    _modified_by = Column(String(3))
-    _created = Column(DateTime)
-    _created_by = Column(String(3))
 
-    inventory = relationship('Inventory')   
+    inventory = relationship('Inventory', primaryjoin='InventoryUom.inventory_id == Inventory.id')
 
 
     def __repr__(self):
@@ -153,3 +160,20 @@ class InventoryUom(Base):
                             self._modified,
                             self._created_by,
                             self._modified_by)
+
+class InventoryProductCode(Base):
+    __tablename__ = 'inventory_product_codes'
+
+    _dbversion = Column(Integer)
+    _modified = Column(DateTime)
+    _modified_by = Column(String(3))
+    _created = Column(DateTime)
+    _created_by = Column(String(3))
+    id = Column(Integer, primary_key=True, server_default=text("nextval('inventory_product_codes_id_seq'::regclass)"))
+    product_code = Column(String(10), unique=True)
+    description = Column(String(80))
+    default_margin = Column(Numeric(9, 2))
+    sales_acct = Column(Integer)
+    surcharge_pct = Column(Numeric(7, 2), nullable=False)
+    udf_data = Column(JSONB(astext_type=Text()), server_default=text("'{}'::jsonb"))
+    sales_tax_provider_code = Column(String)

@@ -1,5 +1,5 @@
 from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, Numeric, String, Table, Text, text, BigInteger, Date, SmallInteger, UniqueConstraint, Index
-from sqlalchemy.dialects.postgresql import UUID, ARRAY, HSTORE
+from sqlalchemy.dialects.postgresql import UUID, ARRAY, HSTORE, JSONB
 from sqlalchemy.orm import relationship
 from ..database import Base
 
@@ -7,9 +7,6 @@ from ..database import Base
 class SalesHistory(Base):
     __tablename__ = 'sales_history'
 
-    id = Column(Integer, primary_key=True, server_default=text("nextval('sales_history_id_seq'::regclass)"))
-    trans_no = Column(String(10), index=True)
-    was_standing_no = Column(String(10))
     _dbversion = Column(Integer)
     _modified = Column(DateTime)
     _modified_by = Column(String(3))
@@ -44,7 +41,7 @@ class SalesHistory(Base):
     fob = Column(String(20))
     currency = Column(String(3), nullable=False, server_default=text("''::character varying"))
     currency_rate_method = Column(String(1))
-    currency_rate = Column(Numeric(13, 7), nullable=False)
+    currency_rate = Column(Numeric(13, 7), nullable=False, server_default=text("1"))
     discount = Column(Numeric(5, 2), nullable=False)
     was_quote_no = Column(String(10))
     sales_tax_rate = Column(ARRAY(Numeric(precision=7, scale=4)), nullable=False, server_default=text("'{0,0,0,0}'::numeric[]"))
@@ -78,9 +75,13 @@ class SalesHistory(Base):
     contact_fax_type = Column(SmallInteger)
     contact_email = Column(String(254))
     total_weight = Column(Numeric(15, 2))
-    udf_data = Column(HSTORE(Text()), server_default=text("''::hstore"))
-
-
+    udf_data = Column(JSONB(astext_type=Text()), server_default=text("'{}'::jsonb"))
+    id = Column(Integer, primary_key=True, server_default=text("nextval('sales_history_id_seq'::regclass)"))
+    trans_no = Column(String(10), index=True)
+    was_standing_no = Column(String(10))
+    user_weight = Column(Boolean)
+    sales_tax_provider_id = Column(String)
+    whse = Column(String(6))
 
     def __repr__(self):
         return ('<Invoice({0},{1},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12})>') \

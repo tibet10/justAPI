@@ -38,7 +38,6 @@ def GetInventoryById(id):
     except Exception as ex:
         abort(404, description=str(ex))
 
-
 @inventory_bp.route('/inventory/items/GetInventoryByPartNo', methods=['GET'])
 def GetInventoryByPartNo():
     
@@ -48,7 +47,7 @@ def GetInventoryByPartNo():
         partNo = request.args.get('partNo')
 
         inventory = InventoryService.getInventoryByPartNo(partNo)
-
+        
         if inventory: 
             result['id']= inventory.id
             result['whse'] = inventory.whse

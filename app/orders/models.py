@@ -1,44 +1,20 @@
 from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, Numeric, String, Table, Text, text, BigInteger, Date, SmallInteger, UniqueConstraint, Index
-from sqlalchemy.dialects.postgresql import UUID, ARRAY, HSTORE
+from sqlalchemy.dialects.postgresql import UUID, ARRAY, HSTORE, JSONB
 from sqlalchemy.orm import relationship
 from ..database import Base
 
 metadata = Base.metadata
 
 class SalesOrder(Base):
-    
     __tablename__ = 'sales_orders'
-    
-    id = Column(Integer, primary_key=True, server_default=text("nextval('sales_orders_id_seq'::regclass)"))
-    order_type = Column(String(1))
-    hold = Column(Boolean)
-    inv_date_rrule = Column(String(120))
-    batch_no = Column(BigInteger)
-    total_payments = Column(Numeric(15, 2), nullable=False)
-    backordered = Column(Boolean)
-    sales_tax_applicable_ordered = Column(ARRAY(Numeric(precision=15, scale=2)), nullable=False, server_default=text("'{0,0,0,0}'::numeric[]"))
-    subtotal_ordered = Column(Numeric(15, 2), nullable=False)
-    total_discount_ordered = Column(Numeric(15, 2), nullable=False)
-    freight_ordered = Column(Numeric(15, 2), nullable=False)
-    sales_tax_total_ordered = Column(ARRAY(Numeric(precision=15, scale=2)), nullable=False, server_default=text("'{0,0,0,0}'::numeric[]"))
-    sales_tax_ordered = Column(Numeric(15, 2), nullable=False)
-    gross_profit_ordered = Column(Numeric(15, 2), nullable=False)
-    current_cost_ordered = Column(Numeric(15, 2), nullable=False)
-    average_cost_ordered = Column(Numeric(15, 2), nullable=False)
-    standard_cost_ordered = Column(Numeric(15, 5), nullable=False)
-    total_ordered = Column(Numeric(15, 2), nullable=False)
-    total_surcharge_ordered = Column(Numeric(15, 2), nullable=False, server_default=text("'0'::numeric"))
-    backorder_created = Column(Boolean)
-    cr_approve_amt = Column(Numeric(15, 2), nullable=False)
-    cr_approve_date = Column(Date)
-    cr_approve_user = Column(String(3))
-    _deleted = Column(DateTime)
-    _deleted_by = Column(String(3))
+
     _dbversion = Column(Integer)
     _modified = Column(DateTime)
     _modified_by = Column(String(3))
     _created = Column(DateTime)
     _created_by = Column(String(3))
+    _deleted = Column(DateTime)
+    _deleted_by = Column(String(3))
     order_no = Column(String(10), unique=True)
     order_date = Column(Date)
     invoice_no = Column(String(10))
@@ -46,7 +22,6 @@ class SalesOrder(Base):
     cust_no = Column(String(20), index=True)
     cust_name = Column(String(60))
     cust_po_no = Column(String(20))
-    status = Column(String(1), index=True)
     division = Column(String(3))
     location = Column(String(24))
     profit_center = Column(String(24))
@@ -69,7 +44,7 @@ class SalesOrder(Base):
     fob = Column(String(20))
     currency = Column(String(3), nullable=False, server_default=text("''::character varying"))
     currency_rate_method = Column(String(1))
-    currency_rate = Column(Numeric(13, 7), nullable=False)
+    currency_rate = Column(Numeric(13, 7), nullable=False, server_default=text("1"))
     discount = Column(Numeric(5, 2), nullable=False)
     was_quote_no = Column(String(10))
     sales_tax_rate = Column(ARRAY(Numeric(precision=7, scale=4)), nullable=False, server_default=text("'{0,0,0,0}'::numeric[]"))
@@ -89,8 +64,6 @@ class SalesOrder(Base):
     total = Column(Numeric(15, 2), nullable=False)
     total_surcharge = Column(Numeric(15, 2), nullable=False, server_default=text("'0'::numeric"))
     user_surcharge = Column(Boolean)
-    last_inv_no = Column(String(10))
-    last_inv_date = Column(Date)
     processed_user = Column(String(3))
     processed_date = Column(DateTime)
     invoiced_user = Column(String(3))
@@ -105,7 +78,36 @@ class SalesOrder(Base):
     contact_fax_type = Column(SmallInteger)
     contact_email = Column(String(254))
     total_weight = Column(Numeric(15, 2))
-    udf_data = Column(HSTORE(Text()), server_default=text("''::hstore"))
+    udf_data = Column(JSONB(astext_type=Text()), server_default=text("'{}'::jsonb"))
+    id = Column(Integer, primary_key=True, server_default=text("nextval('sales_orders_id_seq'::regclass)"))
+    order_type = Column(String(1))
+    status = Column(String(1), index=True)
+    hold = Column(Boolean)
+    inv_date_rrule = Column(String(120))
+    batch_no = Column(BigInteger)
+    total_payments = Column(Numeric(15, 2), nullable=False)
+    backordered = Column(Boolean)
+    sales_tax_applicable_ordered = Column(ARRAY(Numeric(precision=15, scale=2)), nullable=False, server_default=text("'{0,0,0,0}'::numeric[]"))
+    subtotal_ordered = Column(Numeric(15, 2), nullable=False)
+    total_discount_ordered = Column(Numeric(15, 2), nullable=False)
+    freight_ordered = Column(Numeric(15, 2), nullable=False)
+    sales_tax_total_ordered = Column(ARRAY(Numeric(precision=15, scale=2)), nullable=False, server_default=text("'{0,0,0,0}'::numeric[]"))
+    sales_tax_ordered = Column(Numeric(15, 2), nullable=False)
+    gross_profit_ordered = Column(Numeric(15, 2), nullable=False)
+    current_cost_ordered = Column(Numeric(15, 2), nullable=False)
+    average_cost_ordered = Column(Numeric(15, 2), nullable=False)
+    standard_cost_ordered = Column(Numeric(15, 5), nullable=False)
+    total_ordered = Column(Numeric(15, 2), nullable=False)
+    total_surcharge_ordered = Column(Numeric(15, 2), nullable=False, server_default=text("'0'::numeric"))
+    backorder_created = Column(Boolean)
+    cr_approve_amt = Column(Numeric(15, 2), nullable=False)
+    cr_approve_date = Column(Date)
+    cr_approve_user = Column(String(3))
+    last_inv_no = Column(String(10))
+    last_inv_date = Column(Date)
+    user_weight = Column(Boolean)
+    sales_tax_provider_id = Column(String)
+    whse = Column(String(6))
 
     def __repr__(self):
         return ('<SalesOrder({0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17},{18})>') \
@@ -133,21 +135,17 @@ class SalesOrderItem(Base):
     __tablename__ = 'sales_order_items'
     __table_args__ = (
         UniqueConstraint('order_no', 'sequence'),
-        Index('sales_order_items_whse_part_no_idx', 'whse', 'part_no'),
-        Index('sales_order_items_guid_order_no_idx', 'guid', 'order_no', unique=True)
+        Index('sales_order_items_guid_order_no_idx', 'guid', 'order_no', unique=True),
+        Index('sales_order_items_whse_part_no_idx', 'whse', 'part_no')
     )
 
-    id = Column(Integer, primary_key=True, server_default=text("nextval('sales_order_items_id_seq'::regclass)"))
-    order_no = Column(String(10), index=True)
-    req_no = Column(String(10))
-    backorder_todate_qty = Column(Numeric(15, 5), nullable=False)
-    _deleted = Column(DateTime)
-    _deleted_by = Column(String(3))
     _dbversion = Column(Integer)
     _modified = Column(DateTime)
     _modified_by = Column(String(3))
     _created = Column(DateTime)
     _created_by = Column(String(3))
+    _deleted = Column(DateTime)
+    _deleted_by = Column(String(3))
     sequence = Column(SmallInteger)
     parent_item = Column(SmallInteger)
     guid = Column(String(32))
@@ -198,8 +196,19 @@ class SalesOrderItem(Base):
     job_acct_no = Column(String(10))
     weight = Column(Numeric(15, 5))
     comment = Column(Text)
-    udf_data = Column(HSTORE(Text()), server_default=text("''::hstore"))
-    suppress = Column(Boolean, server_default=text("false"))
+    udf_data = Column(JSONB(astext_type=Text()), server_default=text("'{}'::jsonb"))
+    suppress = Column(Boolean, nullable=False, server_default=text("false"))
+    id = Column(Integer, primary_key=True, server_default=text("nextval('sales_order_items_id_seq'::regclass)"))
+    order_no = Column(String(10), index=True)
+    req_no = Column(String(10))
+    backorder_todate_qty = Column(Numeric(15, 5), nullable=False)
+    kit = Column(Boolean, nullable=False, server_default=text("false"))
+    kit_component = Column(Boolean, nullable=False, server_default=text("false"))
+    kit_average_cost = Column(Numeric(15, 5), nullable=False, server_default=text("'0'::numeric"))
+    kit_current_cost = Column(Numeric(15, 5), nullable=False, server_default=text("'0'::numeric"))
+    kit_standard_cost = Column(Numeric(15, 5), nullable=False, server_default=text("'0'::numeric"))
+    user_current_cost = Column(Boolean)
+    user_standard_cost = Column(Boolean)
 
     def __repr__(self):
         return ('<SalesOrderItem({0},{1},{2},{3},{4},{5},{6},{7},{8},{9})>') \

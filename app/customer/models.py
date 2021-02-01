@@ -1,11 +1,16 @@
 from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, Numeric, String, Table, Text, text, BigInteger, Date, SmallInteger, UniqueConstraint, Index
-from sqlalchemy.dialects.postgresql import UUID, ARRAY, HSTORE
+from sqlalchemy.dialects.postgresql import UUID, ARRAY, HSTORE, JSONB
 from sqlalchemy.orm import relationship
 from ..database import Base
 
 class Customer(Base):
     __tablename__ = 'customers'
 
+    _dbversion = Column(Integer)
+    _modified = Column(DateTime)
+    _modified_by = Column(String(3))
+    _created = Column(DateTime)
+    _created_by = Column(String(3))
     id = Column(Integer, primary_key=True, server_default=text("nextval('customers_id_seq'::regclass)"))
     cust_no = Column(String(20), unique=True)
     name = Column(String(60), index=True)
@@ -51,13 +56,9 @@ class Customer(Base):
     bank_account = Column(String(31))
     levy_exempt = Column(Boolean, nullable=False, server_default=text("false"))
     surcharge_exempt = Column(Boolean, nullable=False, server_default=text("false"))
-    udf_data = Column(HSTORE(Text()), server_default=text("''::hstore"))
-    provider_id = Column(String(32))
-    _dbversion = Column(Integer)
-    _modified = Column(DateTime)
-    _modified_by = Column(String(3))
-    _created = Column(DateTime)
-    _created_by = Column(String(3))
+    udf_data = Column(JSONB(astext_type=Text()), server_default=text("'{}'::jsonb"))
+    payment_provider_id = Column(String)
+    sales_tax_provider_entity_code = Column(String)
     
     def __repr__(self):
         return ('<Customer({0},{1},{2},{3})>') \
