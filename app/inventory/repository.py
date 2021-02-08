@@ -8,12 +8,10 @@ class InventoryRepository:
         try:
             with session_scope() as session:      
 
-                print('pre tashi topgyal')
                 inventory = session.query(Inventory)\
                                    .filter(Inventory.part_no == partNo) \
                                    .first()
 
-                print('post tashi topgyal')
                 return inventory
 
         except Exception as ex:
