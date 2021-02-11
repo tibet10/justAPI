@@ -53,8 +53,8 @@ class OrderService:
                 result['status']= sales_order.status
                 result['type']= sales_order.order_type
                 result['orderDate']= sales_order.order_date
-                result['subtotal']= str(sales_order.subtotal)
-                result['total']= str(sales_order.total)
+                result['subtotalOrdered']= str(sales_order.subtotal_ordered)
+                result['totalOrdered']= str(sales_order.total_ordered)
                 result['created']= sales_order._created
                 result['modified']= sales_order._modified
                 result['createdBy']= sales_order._created_by
