@@ -114,7 +114,8 @@ class Inventory(Base):
                             self._modified,
                             self._created_by,
                             self._modified_by,
-                            self.hold)
+                            self.hold,
+                            self.upload)
 
 class InventoryUom(Base):
     __tablename__ = 'inventory_uoms'
@@ -149,13 +150,21 @@ class InventoryUom(Base):
 
 
     def __repr__(self):
-        return ('<InventoryUom({0},{1},{2},{3},{4},{5},{6},{7},{8},{9})>') \
+        return ('<InventoryUom({0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17})>') \
                     .format(self.id, 
                             self.inventory_id,
                             self.whse,
                             self.part_no, 
                             self.uom,
                             self.sell_prices,
+                            self.description,
+                            self.whse_location,
+                            self.weight,
+                            self.buy_uom,
+                            self.sell_uom,
+                            self.allow_fractional_qty,
+                            self.qty_factor,
+                            self.direct_factor,
                             self._created,
                             self._modified,
                             self._created_by,

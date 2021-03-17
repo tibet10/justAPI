@@ -48,3 +48,30 @@ class InventoryRepository:
            raise Exception(str(ex))
         
         return None
+
+    def getRecentInventories(modified):
+        try:
+            with session_scope() as session:      
+
+                    inventories = session.query(Inventory) \
+                                         .filter(Inventory._modified > modified) \
+                                         .all()
+                                 
+                    return inventories
+
+        except Exception as ex:
+           raise Exception(str(ex))
+        
+        return None
+
+    def getAllInventories():
+        try:
+            with session_scope() as session:      
+
+                    return session.query(Inventory) \
+                                  .all()
+
+        except Exception as ex:
+           raise Exception(str(ex))
+        
+        return None
