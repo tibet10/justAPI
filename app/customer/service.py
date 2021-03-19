@@ -4,6 +4,18 @@ from .repository import CustomerRepository
 
 class CustomerService:
 
+    def getCustomerById(id):
+        try:
+            return CustomerRepository.getCustomerById(id)
+        except Exception as ex:
+            raise Exception(str(ex))
+
+    def getRecentCustomers(modified):
+        try:
+            return CustomerRepository.getRecentCustomers(modified)
+        except Exception as ex:
+            raise Exception(str(ex))
+    
     def getCustomerByNo(custNo):
         try:
             return CustomerRepository.getCustomerByNo(custNo)

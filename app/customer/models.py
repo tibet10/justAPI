@@ -61,8 +61,11 @@ class Customer(Base):
     sales_tax_provider_entity_code = Column(String)
     
     def __repr__(self):
-        return ('<Customer({0},{1},{2},{3})>') \
+        return ('<Customer({0},{1},{2},{3},{4},{5},{6})>') \
                     .format(self.id, 
                             self.cust_no,
                             self.name,
-                            self._created)
+                            self.status,
+                            self._modified,
+                            self._created,
+                            self.last_modified)

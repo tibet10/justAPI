@@ -17,3 +17,29 @@ class CustomerRepository:
             raise Exception(str(ex))
         
         return None
+
+    def getCustomerById(id):
+        try:
+            with session_scope() as session:      
+
+                return session.query(Customer)\
+                                   .filter(Customer.id == id) \
+                                   .first()
+
+        except Exception as ex:
+            raise Exception(str(ex))
+        
+        return None
+
+    def getRecentCustomers(modified):
+        try:
+            with session_scope() as session:      
+
+                    return session.query(Customer) \
+                                  .filter(Customer.last_modified > modified) \
+                                  .all()
+
+        except Exception as ex:
+           raise Exception(str(ex))
+        
+        return None

@@ -54,7 +54,7 @@ class Address(Base):
     udf_data = Column(JSONB(astext_type=Text()), server_default=text("'{}'::jsonb"))
 
     def __repr__(self):
-        return ('<Address({0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13})>') \
+        return ('<Address({0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17},{18},{19})>') \
                     .format(self.id, 
                             self.city,
                             self.postal_zip, 
@@ -68,4 +68,10 @@ class Address(Base):
                             self.address,                            
                             self.addr_type,
                             self.fax,
-                            self.sales_tax_no)
+                            self.sales_tax_no,
+                            self.ship_id,
+                            self.sell_no,
+                            self.contact_name,
+                            self.contact_email,
+                            self.contact_phone,
+                            self.contact_fax)

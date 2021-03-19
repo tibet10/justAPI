@@ -36,7 +36,6 @@ class InventoryService:
         except Exception as ex:
             raise Exception(str(ex))
 
-
     def buildUom(inventory_id):
         try:
             result = {}

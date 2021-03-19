@@ -36,3 +36,49 @@ class AddressRepository:
         
         return None
 
+    def getEmailByCustomerNo(customerNo):
+        try:
+            with session_scope() as session:      
+
+                    address = session.query(Address) \
+                              .filter(Address.link_no == customerNo) \
+                              .filter(Address.link_table == 'CUST') \
+                              .filter(Address.addr_type == 'B') \
+                              .first()
+                    return address.email
+
+        except Exception as ex:
+           raise Exception(str(ex))
+        
+        return None
+
+    def getCustomerBillingAddress(customerNo):
+        try:
+            with session_scope() as session:      
+
+                    return session.query(Address) \
+                              .filter(Address.link_no == customerNo) \
+                              .filter(Address.link_table == 'CUST') \
+                              .filter(Address.addr_type == 'B') \
+                              .first()
+
+        except Exception as ex:
+           raise Exception(str(ex))
+        
+        return None
+
+    def getAllShippingAddressByCustNo(customerNo):
+        try:
+            with session_scope() as session:      
+
+                   return session.query(Address) \
+                                         .filter(Address.link_no == customerNo) \
+                                         .filter(Address.link_table == 'CUST') \
+                                         .filter(Address.addr_type == 'S') \
+                                         .all()
+
+        except Exception as ex:
+           raise Exception(str(ex))
+        
+        return None
+

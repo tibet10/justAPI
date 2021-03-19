@@ -72,10 +72,10 @@ class OrderService:
                 result['customer'] = CustomerService.createCustomerDetails(customer)
 
                 billing_address = AddressService.getBillingAddressByOrderNo(sales_order.order_no)
-                result['address'] = AddressService.createBillingAddressDetails(billing_address)
+                result['address'] = AddressService.buildOrderAddress(billing_address)
 
                 shipping_address = AddressService.getShippingAddressByOrderNo(sales_order.order_no)                
-                result['shippingAddress'] = AddressService.createShippingAddressDetails(shipping_address)
+                result['shippingAddress'] = AddressService.buildOrderAddress(shipping_address)
 
                 sales_taxes = SalesTaxService.getSalesTaxByNumber(shipping_address.sales_tax_no)
                 result['taxes'] = SalesTaxService.createTaxDetails(sales_taxes)
