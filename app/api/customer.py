@@ -69,3 +69,33 @@ def GetRecentCustomers():
         abort(404, description=str(e))
 
     return result
+
+
+@customer_bp.route('/customers/GetAllCustomers', methods=['GET'])
+def GetAllCustomers():
+    try:
+        result = []  
+
+        customers = CustomerService.getAllCustomers()
+
+        for customer in customers:
+                billing_address = AddressService.getCustomerBillingAddress(customer.cust_no)
+                shipping_addresses = AddressService.getAllShippingAddressByCustNo(customer.cust_no)
+
+                result.append({
+                    'id': customer.id,
+                    'customerNo': customer.cust_no,
+                    'name': customer.name,
+                    'email': AddressService.getEmailByCustomerNo(customer.cust_no),
+                    'status': customer.status,
+                    'modified': customer._modified,
+                    'address': AddressService.buildCustomerBillingAddress(billing_address),
+                    'shippingAddresses': AddressService.buildCustomerShippingAddresses(shipping_addresses)
+                })
+
+        return Response(status=200, mimetype='application/json', response= json.dumps(result) if result else 'null')
+
+    except Exception as e:
+        abort(404, description=str(e))
+
+    return result

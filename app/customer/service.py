@@ -25,6 +25,12 @@ class CustomerService:
         
         return None
 
+    def getAllCustomers():
+        try:
+            return CustomerRepository.getAllCustomers()
+        except Exception as ex:
+            raise Exception(str(ex))
+
     def createCustomerDetails(customer):
         try:
             result = {

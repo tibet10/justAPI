@@ -43,3 +43,15 @@ class CustomerRepository:
            raise Exception(str(ex))
         
         return None
+
+    def getAllCustomers():
+        try:
+            with session_scope() as session:      
+
+                    return session.query(Customer) \
+                                  .all()
+
+        except Exception as ex:
+           raise Exception(str(ex))
+        
+        return None
