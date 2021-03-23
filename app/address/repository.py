@@ -82,3 +82,16 @@ class AddressRepository:
         
         return None
 
+    def getAddressById(id):
+        try:
+            with session_scope() as session:      
+
+                return session.query(Address)\
+                                   .filter(Address.id == id) \
+                                   .first()
+
+        except Exception as ex:
+            raise Exception(str(ex))
+        
+        return None
+
