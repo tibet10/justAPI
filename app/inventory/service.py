@@ -38,7 +38,9 @@ class InventoryService:
 
     def buildUom(inventory_id):
         try:
-            result = {}
+            result = {
+                'EA': None
+            }
         
             uom = InventoryService.getUomByInventoryId(inventory_id)
 
@@ -56,7 +58,7 @@ class InventoryService:
                         "directFactor": uom.direct_factor
                 }
 
-                return result
+            return result
 
         except Exception as ex:
             raise Exception(str(ex))
@@ -66,7 +68,9 @@ class InventoryService:
     def buildUomSellingPrices(inventory_id):
         
         try:
-            result = {}
+            result = {
+                'EA': None
+            }
         
             uom = InventoryService.getUomByInventoryId(inventory_id)
 
@@ -80,7 +84,7 @@ class InventoryService:
                         "sellPrices": selling_price
                 }
 
-                return result
+            return result
 
         except Exception as ex:
             raise Exception(str(ex))
